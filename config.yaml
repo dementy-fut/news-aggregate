@@ -1,0 +1,49 @@
+categories:
+  world:
+    label: "World"
+    importance_threshold: 7
+    sources:
+      - name: reuters
+        url: "https://www.rss-bridge.org/bridge01/?action=display&bridge=FilterBridge&url=https%3A%2F%2Fwww.reuters.com%2Fworld%2F&format=Atom"
+        bias: neutral
+      - name: bbc
+        url: "https://feeds.bbci.co.uk/news/world/rss.xml"
+        bias: center
+      - name: cnn
+        url: "http://rss.cnn.com/rss/edition_world.rss"
+        bias: center-left
+      - name: fox_news
+        url: "https://moxie.foxnews.com/google-publisher/world.xml"
+        bias: right
+      - name: aljazeera
+        url: "https://www.aljazeera.com/xml/rss/all.xml"
+        bias: alternative
+      - name: ap_news
+        url: "https://rsshub.app/apnews/topics/world-news"
+        bias: neutral
+      - name: guardian
+        url: "https://www.theguardian.com/world/rss"
+        bias: left
+      - name: rt
+        url: "https://www.rt.com/rss/news/"
+        bias: russian-state
+
+  ai:
+    label: "AI"
+    importance_threshold: 7
+    sources:
+      - name: techcrunch_ai
+        url: "https://techcrunch.com/category/artificial-intelligence/feed/"
+        bias: tech-industry
+      - name: theverge_ai
+        url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml"
+        bias: consumer-tech
+      - name: arstechnica
+        url: "https://feeds.arstechnica.com/arstechnica/technology-lab"
+        bias: technical
+      - name: venturebeat_ai
+        url: "https://venturebeat.com/category/ai/feed/"
+        bias: enterprise
+      - name: mit_tech_review
+        url: "https://www.technologyreview.com/feed/"
+        bias: research
