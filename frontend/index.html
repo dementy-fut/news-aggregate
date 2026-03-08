@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Lens</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>News Lens</h1>
+        <p class="subtitle">Cross-source news analysis</p>
+    </header>
+
+    <nav class="tabs">
+        <button class="tab active" data-category="world">World</button>
+        <button class="tab" data-category="ai">AI</button>
+    </nav>
+
+    <div class="controls">
+        <div class="date-nav">
+            <button id="prev-day">&larr;</button>
+            <span id="current-date"></span>
+            <button id="next-day">&rarr;</button>
+        </div>
+        <div class="filters">
+            <select id="credibility-filter">
+                <option value="all">All</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="likely">Likely</option>
+                <option value="unverified">Unverified</option>
+                <option value="disputed">Disputed</option>
+            </select>
+            <label class="toggle">
+                <input type="checkbox" id="top-only" checked>
+                Top stories only
+            </label>
+        </div>
+    </div>
+
+    <main id="events-container">
+        <div class="loading">Loading...</div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="app.js"></script>
+</body>
+</html>
