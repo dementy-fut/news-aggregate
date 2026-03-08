@@ -1,0 +1,302 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #0f0f0f;
+    color: #e0e0e0;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.subtitle {
+    color: #888;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #2a2a2a;
+    padding-bottom: 12px;
+}
+
+.tab {
+    background: none;
+    border: 1px solid #333;
+    color: #888;
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    color: #ccc;
+    border-color: #555;
+}
+
+.tab.active {
+    background: #1a1a2e;
+    color: #fff;
+    border-color: #4a4ae0;
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.date-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.date-nav button {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #ccc;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.date-nav button:hover {
+    background: #2a2a2a;
+}
+
+.date-nav button:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+#current-date {
+    font-size: 16px;
+    font-weight: 600;
+    min-width: 120px;
+    text-align: center;
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.filters select {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #ccc;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #888;
+    cursor: pointer;
+}
+
+.toggle input {
+    accent-color: #4a4ae0;
+}
+
+/* Event cards */
+.event-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+}
+
+.event-card:hover {
+    border-color: #3a3a3a;
+}
+
+.event-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.credibility-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.credibility-dot.confirmed { background: #4caf50; }
+.credibility-dot.likely { background: #ff9800; }
+.credibility-dot.unverified { background: #9e9e9e; }
+.credibility-dot.disputed { background: #f44336; }
+
+.event-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: #fff;
+    flex-grow: 1;
+}
+
+.event-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    margin-left: 22px;
+    font-size: 13px;
+    color: #888;
+}
+
+.event-meta .badge {
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.badge.confirmed { background: #1b3a1b; color: #4caf50; }
+.badge.likely { background: #3a2e1b; color: #ff9800; }
+.badge.unverified { background: #2a2a2a; color: #9e9e9e; }
+.badge.disputed { background: #3a1b1b; color: #f44336; }
+
+.event-summary {
+    margin-top: 12px;
+    margin-left: 22px;
+    font-size: 14px;
+    color: #bbb;
+    line-height: 1.5;
+}
+
+/* Expandable analysis */
+.event-analysis {
+    display: none;
+    margin-top: 16px;
+    margin-left: 22px;
+    padding-top: 16px;
+    border-top: 1px solid #2a2a2a;
+}
+
+.event-analysis.open {
+    display: block;
+}
+
+.source-analysis {
+    margin-bottom: 16px;
+}
+
+.source-analysis h4 {
+    font-size: 14px;
+    color: #4a4ae0;
+    margin-bottom: 6px;
+}
+
+.source-analysis .tone {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.source-analysis .focus {
+    font-size: 13px;
+    color: #bbb;
+    line-height: 1.4;
+}
+
+.credibility-section {
+    margin-top: 16px;
+    padding: 12px;
+    background: #111;
+    border-radius: 6px;
+}
+
+.credibility-section h4 {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 6px;
+}
+
+.credibility-section p {
+    font-size: 13px;
+    color: #bbb;
+    line-height: 1.4;
+}
+
+.article-links {
+    margin-top: 16px;
+}
+
+.article-links h4 {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.article-links a {
+    display: block;
+    color: #6a6ae0;
+    text-decoration: none;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.article-links a:hover {
+    text-decoration: underline;
+}
+
+.article-links .source-label {
+    color: #666;
+    font-size: 11px;
+    margin-right: 6px;
+}
+
+/* States */
+.loading {
+    text-align: center;
+    color: #888;
+    padding: 60px 0;
+    font-size: 15px;
+}
+
+.empty {
+    text-align: center;
+    color: #666;
+    padding: 60px 0;
+    font-size: 15px;
+}
