@@ -6,7 +6,7 @@ import re
 import time
 from datetime import date
 
-import google.generativeai as genai
+from google import genai
 from dotenv import load_dotenv
 
 from db import (
@@ -23,9 +23,10 @@ logger = logging.getLogger(__name__)
 REQUEST_DELAY = 5  # seconds between Gemini calls
 
 
-def get_model():
-    genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-    return genai.GenerativeModel("gemini-2.0-flash")
+def get_client():
+    return genai.Client(api_key=os.environ["GEMINI_API_KEY"])
+
+MODEL = "gemini-2.0-flash"
 
 
 def strip_code_block(text: str) -> str:
@@ -70,7 +71,7 @@ def parse_importance_response(response_text: str, valid_ids: list[str]) -> dict[
     return result
 
 
-def filter_by_importance(articles: list[dict], model) -> list[dict]:
+def filter_by_importance(articles: list[dict], client) -> list[dict]:
     """Score articles and update DB. Returns only important ones (score >= 7)."""
     if not articles:
         return []
@@ -84,7 +85,7 @@ def filter_by_importance(articles: list[dict], model) -> list[dict]:
         valid_ids = [a["id"] for a in batch]
 
         try:
-            response = model.generate_content(prompt)
+            response = client.models.generate_content(model=MODEL, contents=prompt)
             scores = parse_importance_response(response.text, valid_ids)
 
             for article in batch:
@@ -137,14 +138,14 @@ def parse_cluster_response(response_text: str) -> list[dict]:
     return json.loads(cleaned)
 
 
-def cluster_articles(articles: list[dict], model) -> list[dict]:
+def cluster_articles(articles: list[dict], client) -> list[dict]:
     """Group articles into event clusters."""
     if not articles:
         return []
 
     prompt = build_cluster_prompt(articles)
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(model=MODEL, contents=prompt)
         clusters = parse_cluster_response(response.text)
         time.sleep(REQUEST_DELAY)
         return clusters
@@ -192,7 +193,7 @@ Credibility criteria:
 Return ONLY the JSON object."""
 
 
-def analyze_cluster(cluster: dict, articles_by_id: dict[str, dict], model) -> dict | None:
+def analyze_cluster(cluster: dict, articles_by_id: dict[str, dict], client) -> dict | None:
     """Analyze a single cluster and return event data for DB."""
     article_ids = cluster.get("article_ids", [])
     articles = [articles_by_id[aid] for aid in article_ids if aid in articles_by_id]
@@ -212,7 +213,7 @@ def analyze_cluster(cluster: dict, articles_by_id: dict[str, dict], model) -> di
 
     prompt = build_analysis_prompt(cluster, articles)
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(model=MODEL, contents=prompt)
         analysis = json.loads(strip_code_block(response.text))
         time.sleep(REQUEST_DELAY)
 
@@ -238,7 +239,7 @@ def analyze_category(category: str):
     """Run full analysis pipeline for one category."""
     logger.info(f"=== Analyzing category: {category} ===")
 
-    model = get_model()
+    client = get_client()
     articles = get_unanalyzed_articles(category)
     logger.info(f"Found {len(articles)} unanalyzed articles")
 
@@ -246,21 +247,21 @@ def analyze_category(category: str):
         return
 
     logger.info("Stage 0: Filtering by importance...")
-    important = filter_by_importance(articles, model)
+    important = filter_by_importance(articles, client)
     logger.info(f"  {len(important)} articles passed importance filter (of {len(articles)})")
 
     if not important:
         return
 
     logger.info("Stage 1: Clustering articles into events...")
-    clusters = cluster_articles(important, model)
+    clusters = cluster_articles(important, client)
     logger.info(f"  Found {len(clusters)} event clusters")
 
     logger.info("Stage 2: Analyzing each cluster...")
     articles_by_id = {a["id"]: a for a in important}
 
     for cluster in clusters:
-        result = analyze_cluster(cluster, articles_by_id, model)
+        result = analyze_cluster(cluster, articles_by_id, client)
         if result:
             insert_event(result["event"], result["article_ids"])
             logger.info(f"  Saved event: {result['event']['title'][:60]}")
