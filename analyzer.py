@@ -20,13 +20,22 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-REQUEST_DELAY = 5  # seconds between Gemini calls
+REQUEST_DELAY = 3  # seconds between API calls
+
+MODEL = "gemma-3-27b-it"
 
 
 def get_client():
     return genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 
-MODEL = "gemini-2.0-flash"
+
+def call_llm(client, prompt: str) -> str:
+    """Call Gemma via Google AI Studio and return response text."""
+    response = client.models.generate_content(
+        model=MODEL,
+        contents=prompt,
+    )
+    return response.text
 
 
 def strip_code_block(text: str) -> str:
@@ -59,7 +68,7 @@ Articles:
 
 
 def parse_importance_response(response_text: str, valid_ids: list[str]) -> dict[str, int]:
-    """Parse Gemini response into {article_id: score}."""
+    """Parse LLM response into {article_id: score}."""
     cleaned = strip_code_block(response_text)
     data = json.loads(cleaned)
     result = {}
@@ -76,7 +85,7 @@ def filter_by_importance(articles: list[dict], client) -> list[dict]:
     if not articles:
         return []
 
-    batch_size = 30
+    batch_size = 15  # smaller batches for 15K TPM limit
     important = []
 
     for i in range(0, len(articles), batch_size):
@@ -85,8 +94,8 @@ def filter_by_importance(articles: list[dict], client) -> list[dict]:
         valid_ids = [a["id"] for a in batch]
 
         try:
-            response = client.models.generate_content(model=MODEL, contents=prompt)
-            scores = parse_importance_response(response.text, valid_ids)
+            response_text = call_llm(client, prompt)
+            scores = parse_importance_response(response_text, valid_ids)
 
             for article in batch:
                 score = scores.get(article["id"], 5)
@@ -145,8 +154,8 @@ def cluster_articles(articles: list[dict], client) -> list[dict]:
 
     prompt = build_cluster_prompt(articles)
     try:
-        response = client.models.generate_content(model=MODEL, contents=prompt)
-        clusters = parse_cluster_response(response.text)
+        response_text = call_llm(client, prompt)
+        clusters = parse_cluster_response(response_text)
         time.sleep(REQUEST_DELAY)
         return clusters
     except Exception as e:
@@ -213,8 +222,8 @@ def analyze_cluster(cluster: dict, articles_by_id: dict[str, dict], client) -> d
 
     prompt = build_analysis_prompt(cluster, articles)
     try:
-        response = client.models.generate_content(model=MODEL, contents=prompt)
-        analysis = json.loads(strip_code_block(response.text))
+        response_text = call_llm(client, prompt)
+        analysis = json.loads(strip_code_block(response_text))
         time.sleep(REQUEST_DELAY)
 
         return {
@@ -263,6 +272,7 @@ def analyze_category(category: str):
     for cluster in clusters:
         result = analyze_cluster(cluster, articles_by_id, client)
         if result:
+            result["event"]["category"] = category
             insert_event(result["event"], result["article_ids"])
             logger.info(f"  Saved event: {result['event']['title'][:60]}")
 
