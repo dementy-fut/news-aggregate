@@ -127,12 +127,13 @@ Rules:
 - Articles from the same source can be in the same group
 - Articles that don't match any group should be in a single-article group
 - Each article can only be in one group
+- IMPORTANT: Write event_title and event_summary in RUSSIAN language
 
 Return ONLY a JSON array:
 [
   {{
-    "event_title": "Short descriptive title of the event",
-    "event_summary": "1-2 sentence factual summary of what happened",
+    "event_title": "Краткий заголовок события на русском",
+    "event_summary": "1-2 предложения: фактическое описание того, что произошло, на русском",
     "article_ids": ["id1", "id2", ...]
   }},
   ...
@@ -171,7 +172,8 @@ def build_analysis_prompt(cluster: dict, articles: list[dict]) -> str:
         lines.append(f'### {a["source"]}\nTitle: {a["title"]}\n{a.get("summary", "")}\n')
 
     articles_text = "\n".join(lines)
-    return f"""Analyze how different news sources cover this event:
+    return f"""Analyze how different news sources cover this event.
+IMPORTANT: Write ALL text values in RUSSIAN language.
 
 Event: {cluster["event_title"]}
 Summary: {cluster["event_summary"]}
@@ -183,14 +185,14 @@ Provide your analysis as JSON:
 {{
   "coverage_analysis": {{
     "<source_name>": {{
-      "tone": "neutral/positive/negative/critical/defensive/alarmist",
-      "focus": "what aspect this source emphasizes",
-      "key_claims": ["specific factual claims made"],
-      "omissions": "what this source doesn't mention that others do"
+      "tone": "нейтральный/позитивный/негативный/критический/оборонительный/алармистский",
+      "focus": "на каком аспекте акцентирует этот источник (на русском)",
+      "key_claims": ["конкретные фактические утверждения (на русском)"],
+      "omissions": "что этот источник не упоминает, а другие упоминают (на русском)"
     }}
   }},
   "credibility_score": "confirmed|likely|unverified|disputed",
-  "credibility_reasoning": "Why this score — based on source agreement/disagreement on core facts"
+  "credibility_reasoning": "Почему такая оценка — на основе согласия/расхождения источников (на русском)"
 }}
 
 Credibility criteria:
@@ -214,7 +216,7 @@ def analyze_cluster(cluster: dict, articles_by_id: dict[str, dict], client) -> d
                 "summary": cluster["event_summary"],
                 "coverage_analysis": None,
                 "credibility_score": "unverified",
-                "credibility_reasoning": "Single source, cannot cross-reference",
+                "credibility_reasoning": "Один источник, перекрёстная проверка невозможна",
                 "event_date": date.today().isoformat(),
             },
             "article_ids": article_ids,
