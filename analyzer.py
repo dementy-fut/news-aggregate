@@ -149,19 +149,25 @@ def parse_cluster_response(response_text: str) -> list[dict]:
 
 
 def cluster_articles(articles: list[dict], client) -> list[dict]:
-    """Group articles into event clusters."""
+    """Group articles into event clusters. Batches if too many articles."""
     if not articles:
         return []
 
-    prompt = build_cluster_prompt(articles)
-    try:
-        response_text = call_llm(client, prompt)
-        clusters = parse_cluster_response(response_text)
-        time.sleep(REQUEST_DELAY)
-        return clusters
-    except Exception as e:
-        logger.error(f"Clustering failed: {e}")
-        return []
+    batch_size = 30
+    all_clusters = []
+
+    for i in range(0, len(articles), batch_size):
+        batch = articles[i : i + batch_size]
+        prompt = build_cluster_prompt(batch)
+        try:
+            response_text = call_llm(client, prompt)
+            clusters = parse_cluster_response(response_text)
+            all_clusters.extend(clusters)
+            time.sleep(REQUEST_DELAY)
+        except Exception as e:
+            logger.error(f"Clustering failed for batch: {e}")
+
+    return all_clusters
 
 
 # --- Stage 2: Deep analysis ---
