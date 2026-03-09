@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,12 +9,14 @@
 <body>
     <header>
         <h1>News Lens</h1>
-        <p class="subtitle">Cross-source news analysis</p>
+        <p class="subtitle">Кросс-анализ новостей из разных источников</p>
     </header>
 
     <nav class="tabs">
-        <button class="tab active" data-category="world">World</button>
-        <button class="tab" data-category="ai">AI</button>
+        <button class="tab active" data-category="world">Мир</button>
+        <button class="tab" data-category="ai">ИИ</button>
+        <span class="tab-divider"></span>
+        <button class="tab view-tab" data-view="week">За неделю</button>
     </nav>
 
     <div class="controls">
@@ -25,21 +27,21 @@
         </div>
         <div class="filters">
             <select id="credibility-filter">
-                <option value="all">All</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="likely">Likely</option>
-                <option value="unverified">Unverified</option>
-                <option value="disputed">Disputed</option>
+                <option value="all">Все</option>
+                <option value="confirmed">Подтверждено</option>
+                <option value="likely">Вероятно</option>
+                <option value="unverified">Не проверено</option>
+                <option value="disputed">Спорно</option>
             </select>
             <label class="toggle">
                 <input type="checkbox" id="top-only" checked>
-                Top stories only
+                Только главное
             </label>
         </div>
     </div>
 
     <main id="events-container">
-        <div class="loading">Loading...</div>
+        <div class="loading">Загрузка...</div>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
