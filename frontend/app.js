@@ -1,9 +1,9 @@
 // app.js
 // Replace these with your Supabase project values
-const SUPABASE_URL = "YOUR_SUPABASE_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL = "https://ybcoprfkckjagjxzhfar.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InliY29wcmZrY2tqYWdqeHpoZmFyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwNzA4MjEsImV4cCI6MjA4ODY0NjgyMX0.4fcalkLYVD3tiWnXMLr5w6V7VHATIFr5dARYjvexW-Y";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // State
 let currentCategory = "world";
@@ -21,7 +21,7 @@ const topOnlyToggle = document.getElementById("top-only");
 // --- Data fetching ---
 
 async function fetchAvailableDates() {
-    const { data, error } = await supabase
+    const { data, error } = await db
         .from("events")
         .select("event_date")
         .eq("category", currentCategory)
@@ -46,7 +46,7 @@ async function fetchEvents() {
 
     const credFilter = credibilityFilter.value;
 
-    let query = supabase
+    let query = db
         .from("events")
         .select("*")
         .eq("category", currentCategory)
@@ -71,14 +71,14 @@ async function fetchEvents() {
     }
 
     for (const event of events) {
-        const { data: links } = await supabase
+        const { data: links } = await db
             .from("event_articles")
             .select("article_id")
             .eq("event_id", event.id);
 
         if (links && links.length > 0) {
             const articleIds = links.map((l) => l.article_id);
-            const { data: articles } = await supabase
+            const { data: articles } = await db
                 .from("articles")
                 .select("*")
                 .in("id", articleIds);
