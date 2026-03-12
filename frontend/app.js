@@ -126,23 +126,41 @@ async function fetchWeekEvents() {
 }
 
 async function loadArticlesForEvents(events) {
-    for (const event of events) {
-        const { data: links } = await db
-            .from("event_articles")
-            .select("article_id")
-            .eq("event_id", event.id);
+    const eventIds = events.map((e) => e.id);
+    if (eventIds.length === 0) return;
 
-        if (links && links.length > 0) {
-            const articleIds = links.map((l) => l.article_id);
-            const { data: articles } = await db
-                .from("articles")
-                .select("*")
-                .in("id", articleIds);
-            event.articles = articles || [];
-        } else {
-            event.articles = [];
-        }
+    // One query: all links for all events
+    const { data: allLinks } = await db
+        .from("event_articles")
+        .select("event_id, article_id")
+        .in("event_id", eventIds);
+
+    if (!allLinks || allLinks.length === 0) {
+        events.forEach((e) => (e.articles = []));
+        return;
     }
+
+    // One query: all articles
+    const articleIds = [...new Set(allLinks.map((l) => l.article_id))];
+    const { data: allArticles } = await db
+        .from("articles")
+        .select("*")
+        .in("id", articleIds);
+
+    const articlesById = {};
+    (allArticles || []).forEach((a) => (articlesById[a.id] = a));
+
+    // Map to events
+    const linksByEvent = {};
+    allLinks.forEach((l) => {
+        if (!linksByEvent[l.event_id]) linksByEvent[l.event_id] = [];
+        linksByEvent[l.event_id].push(l.article_id);
+    });
+
+    events.forEach((e) => {
+        const aids = linksByEvent[e.id] || [];
+        e.articles = aids.map((id) => articlesById[id]).filter(Boolean);
+    });
 }
 
 // --- Rendering ---
