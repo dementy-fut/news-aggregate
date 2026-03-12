@@ -36,15 +36,15 @@ def insert_article(article: dict) -> dict | None:
 
 
 def get_unanalyzed_articles(category: str) -> list[dict]:
-    """Get articles that haven't been assigned to any event yet."""
+    """Get articles that haven't been analyzed yet (importance is NULL)."""
     client = get_client()
-    assigned = client.table("event_articles").select("article_id").execute()
-    assigned_ids = [r["article_id"] for r in assigned.data]
-
-    query = client.table("articles").select("*").eq("category", category)
-    if assigned_ids:
-        query = query.not_.in_("id", assigned_ids)
-    result = query.execute()
+    result = (
+        client.table("articles")
+        .select("*")
+        .eq("category", category)
+        .is_("importance", "null")
+        .execute()
+    )
     return result.data
 
 
